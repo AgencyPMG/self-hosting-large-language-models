@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+pushd "$(git rev-parse --show-toplevel)"
+
+export MODEL_ROOT_PATH="$(pwd)/models"
+
+exec uvicorn app_example.main:app --reload
