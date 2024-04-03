@@ -8,15 +8,6 @@ import argparse
 import pathlib
 from transformers import AutoTokenizer, AutoModel
 
-ArgsType = typing.Optional[typing.List[str]]
-
-def parse_args(args: ArgsType=None) -> argparse.Namespace:
-    p = argparse.ArgumentParser()
-    p.add_argument('model_name', help='The model name to download')
-    p.add_argument('output_path', type=pathlib.Path, help='where to save the model')
-
-    return p.parse_args(args)
-
 def download_model(model_name: str, output_path: pathlib.Path):
     """
     Could drop this into a notebook to download the model in a specific
@@ -31,6 +22,15 @@ def download_model(model_name: str, output_path: pathlib.Path):
     model = AutoModel.from_pretrained(model_name)
     model.save_pretrained(str(output_path))
 
+
+ArgsType = typing.Optional[typing.List[str]]
+
+def parse_args(args: ArgsType=None) -> argparse.Namespace:
+    p = argparse.ArgumentParser()
+    p.add_argument('model_name', help='The model name to download')
+    p.add_argument('output_path', type=pathlib.Path, help='where to save the model')
+
+    return p.parse_args(args)
 def main(args: ArgsType=None):
     args = parse_args(args)
 
