@@ -32,5 +32,8 @@ class PrompResponse(pydantic.BaseModel):
 
 @app.post('/')
 def prompt(prompt: PromptRequest) -> PrompResponse:
+    """
+    Pretend this does actual stuff, and is like a real app
+    """
     result = pipe(prompt.prompt, max_length=100)[0]
     return PrompResponse(generated_text=result['generated_text'])
