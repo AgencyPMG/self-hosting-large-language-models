@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+pushd "$(git rev-parse --show-toplevel)"
+
+if [ ! -d "models" ]; then
+    mkdir models
+fi
+
+if [ -d ".venv" ]; then
+    python -m venv .venv
+fi
+
+source .venv/bin/activate
+
+pip install -r requirements.txt
+
+echo "Downloading GPT2..."
+./download_model.py openai-community/gpt2 models/gpt2
