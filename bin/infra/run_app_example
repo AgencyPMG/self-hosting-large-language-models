@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+pushd "$(git rev-parse --show-toplevel)"
+
+exec docker run --rm \
+    -p 8000:8000 \
+    --volume "$(pwd)/models:/models" \
+    --env MODEL_ROOT_PATH=/models \
+    app_example

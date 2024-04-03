@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+pushd "$(git rev-parse --show-toplevel)"
+
+exec docker build -f app_example/Dockerfile -t app_example .
