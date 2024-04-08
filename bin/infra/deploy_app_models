@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -e
+
+pushd "$(git rev-parse --show-toplevel)"
+
+S3_BUCKET="ailabs-staging-self-hosting-demo-models"
+
+# may want to do this dynamically or not, but for now we'll assume
+# that we've got a process wehre can somehow version this
+# ./download_model.py openai-community/gpt2 models/gpt2
+
+aws s3 sync --delete models/gpt2 s3://$S3_BUCKET/app/gpt2

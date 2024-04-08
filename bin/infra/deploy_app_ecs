@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
+set -e
+
 pushd "$(git rev-parse --show-toplevel)"
 
-REPO="625506553848.dkr.ecr.us-east-1.amazonaws.com "
+export AWS_PAGER=""
+
+REPO="625506553848.dkr.ecr.us-east-1.amazonaws.com"
 APP_REPO="$REPO/ailabs-staging-self-hosted-demo-app"
 NGINX_REPO="$REPO/ailabs-staging-self-hosted-demo-nginx"
 
