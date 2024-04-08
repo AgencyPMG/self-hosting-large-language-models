@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+pushd "$(git rev-parse --show-toplevel)"
+
+REPO="625506553848.dkr.ecr.us-east-1.amazonaws.com "
+APP_REPO="$REPO/ailabs-staging-self-hosted-demo-app"
+NGINX_REPO="$REPO/ailabs-staging-self-hosted-demo-nginx"
+
+# build app containers
+docker build \
+    -f app_example/app.dockerfile \
+    -t "$APP_REPO:latest" \
+    --platform linux/amd64 \
+    .
+
+docker build \
+    -f app_example/nginx.dockerfile \
+    -t "$NGINX_REPO:latest" \
+    --platform linux/amd64 \
+    .
+
+# log into docker for ECR
+aws ecr get-login-password \
+    | docker login --username AWS --password-stdin "$REPO"
+
+# push containers to ECR
+docker push "$APP_REPO:latest"
+docker push "$NGINX_REPO:latest"
+
+# trigger a deployment to swap out the latest containers
+# in a real app youd' probably want some tagged contaienrs here and
+# a slightly different system, but this gets the job down for now.
+aws ecs update-service \
+    --cluster "self-hosting-demo-staging" \
+    --service "app" \
+    --force-new-deployment
