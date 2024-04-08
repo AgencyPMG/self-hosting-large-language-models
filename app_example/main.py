@@ -39,6 +39,10 @@ class PromptRequest(pydantic.BaseModel):
 class PrompResponse(pydantic.BaseModel):
     generated_text: str
 
+@app.get('/health')
+def health() -> str:
+    return 'ok'
+
 @app.post('/')
 def prompt(prompt: PromptRequest) -> PrompResponse:
     """
