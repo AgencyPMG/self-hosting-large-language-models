@@ -1,5 +1,5 @@
 FROM nginx:stable-alpine
 
-ADD app_example/nginx.confg /etc/nginx/nginx.conf
+ADD app_example/nginx.conf /etc/nginx/nginx.conf
 
 RUN nginx -t
