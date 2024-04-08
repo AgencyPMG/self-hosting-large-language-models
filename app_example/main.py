@@ -2,7 +2,16 @@ import os
 import pathlib
 import fastapi
 import pydantic
+import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+
+
+def device() -> str:
+    if torch.cuda.is_available():
+        return 'cuda'
+
+    return 'mps' if torch.backends.mps.is_available() else 'cpu'
+
 
 # where our our models saved, this is an environment variable so it can be
 # passed in at runtime vs hardcoded -- eg it may change in a container vs
@@ -19,7 +28,7 @@ assert model_path.exists()
 # set this up once at the top level of the file so it's available
 # only impact boot time vs every request.
 tokenizer = AutoTokenizer.from_pretrained(str(model_path))
-model = AutoModelForCausalLM.from_pretrained(str(model_path))
+model = AutoModelForCausalLM.from_pretrained(str(model_path)).to(device())
 pipe = pipeline('text-generation', model=model, tokenizer=tokenizer)
 
 app = fastapi.FastAPI()
