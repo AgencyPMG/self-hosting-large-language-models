@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set -e
+
+pushd "$(git rev-parse --show-toplevel)"
+
+if [ "$#" -ne 2 ]; then
+  echo "Usage: $0 <model> <version>"
+  exit 1
+fi
+
+# disable the AWS CLI using a pager
+export AWS_PAGER=""
+
+model="$1"
+version="$2"
+
+S3_BUCKET="ailabs-staging-self-hosting-demo-models"
+
+# may want to do this dynamically or not, but for now we'll assume
+# that we've got a process wehre can somehow version this
+# ./download_model.py openai-community/gpt2 models/gpt2
+
+# upload the model version to S3
+aws s3 sync "models/$model" "s3://$S3_BUCKET/app/$model/$version"
+
+# hardcoded here, but likely this task ARN/ID would be passed in as an environment
+# variable in CI: https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment
+taskArn="arn:aws:datasync:us-east-1:625506553848:task/task-0b89c72250a5dcc7d"
+
+# then use datasync to sync the model to EFS
+aws datasync start-task-execution \
+    --task-arn "$taskArn" \
+    --includes "FilterType=SIMPLE_PATTERN,Value=/$model/$version" 

@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -e
+
+pushd "$(git rev-parse --show-toplevel)"
+
+if [ "$#" -ne 3 ]; then
+  echo "Usage: $0 <environment> <model> <version>"
+  exit 1
+fi
+
+# disable the AWS CLI using a pager
+export AWS_PAGER=""
+
+environment="$1"
+model="$2"
+version="$3"
+
+# update the version parameter
+aws ssm put-parameter \
+    --name "/self-hosting-demo/${environment}/model-version" \
+    --value "$model/$version" \
+    --overwrite
+
+# cycle through a deployment to get the new model version
+aws ecs update-service \
+    --cluster "self-hosting-demo-$environment" \
+    --service "app" \
+    --force-new-deployment

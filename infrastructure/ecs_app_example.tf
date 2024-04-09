@@ -10,6 +10,16 @@ resource "aws_ecr_repository" "app" {
   name = "${local.app}-${local.env}-self-hosted-demo-app"
 }
 
+resource "aws_ssm_parameter" "model-version" {
+  name = "/self-hosting-demo/${local.env}/model-version"
+  type = "String"
+  value = "changeme"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
 resource "aws_ecs_service" "app" {
   name                               = "app"
   cluster                            = aws_ecs_cluster.main.name
@@ -95,6 +105,12 @@ resource "aws_ecs_task_definition" "app" {
           name  = "MODEL_ROOT_PATH"
           value = local.model_root_path
         },
+      ]
+      secrets = [
+        {
+          name = "MODEL_VERSION"
+          valueFrom = aws_ssm_parameter.model-version.name
+        }
       ]
       mountPoints = [
         {

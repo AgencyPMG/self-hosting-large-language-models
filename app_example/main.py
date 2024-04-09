@@ -21,7 +21,7 @@ assert model_root.exists()
 
 # model itself is gonna be relative to the root path, this is likely not gonna be
 # dynamic, but hardcoded
-model_name = 'gpt2'
+model_name = os.environ['MODEL_VERSION']
 model_path = model_root / model_name
 assert model_path.exists()
 

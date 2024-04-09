@@ -127,3 +127,7 @@ resource "aws_datasync_task" "app" {
     uid = "NONE"
   }
 }
+
+output "aws_datasync_task" {
+  value = aws_datasync_task.app
+}

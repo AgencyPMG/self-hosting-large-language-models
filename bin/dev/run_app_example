@@ -3,5 +3,6 @@
 pushd "$(git rev-parse --show-toplevel)"
 
 export MODEL_ROOT_PATH="$(pwd)/models"
+export MODEL_VERSION="gpt2"
 
 exec uvicorn app_example.main:app --reload

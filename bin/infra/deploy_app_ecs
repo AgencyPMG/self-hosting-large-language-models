@@ -4,8 +4,14 @@ set -e
 
 pushd "$(git rev-parse --show-toplevel)"
 
+if [ "$#" -ne 1 ]; then
+  echo "Usage: $0 <environment>"
+  exit 1
+fi
+
 export AWS_PAGER=""
 
+environment="$1"
 REPO="625506553848.dkr.ecr.us-east-1.amazonaws.com"
 APP_REPO="$REPO/ailabs-staging-self-hosted-demo-app"
 NGINX_REPO="$REPO/ailabs-staging-self-hosted-demo-nginx"
@@ -35,6 +41,6 @@ docker push "$NGINX_REPO:latest"
 # in a real app youd' probably want some tagged contaienrs here and
 # a slightly different system, but this gets the job down for now.
 aws ecs update-service \
-    --cluster "self-hosting-demo-staging" \
+    --cluster "self-hosting-demo-$environment" \
     --service "app" \
     --force-new-deployment
