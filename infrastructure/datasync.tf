@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_log_group" "datasync" {
-  name = "${local.app}-${local.env}-self-hosting-demo-datasync"
+  name              = "${local.app}-${local.env}-self-hosting-demo-datasync"
   retention_in_days = 7
 }
 
@@ -53,13 +53,13 @@ data "aws_iam_policy_document" "datasync-trust" {
 }
 
 resource "aws_iam_role" "datasync" {
-  name = "self-hosting-demo-datasync@${local.app}-${local.env}"
+  name               = "self-hosting-demo-datasync@${local.app}-${local.env}"
   assume_role_policy = data.aws_iam_policy_document.datasync-trust.json
 }
 
 data "aws_iam_policy_document" "datasync" {
   statement {
-    sid = "AllowS3"
+    sid    = "AllowS3"
     effect = "Allow"
     actions = [
       "s3:GetBucketLocation",
@@ -77,54 +77,54 @@ data "aws_iam_policy_document" "datasync" {
 }
 
 resource "aws_iam_role_policy" "datasync" {
-  name = "allow-datasync"
-  role = aws_iam_role.datasync.name
+  name   = "allow-datasync"
+  role   = aws_iam_role.datasync.name
   policy = data.aws_iam_policy_document.datasync.json
 }
 
 resource "aws_security_group" "datasync" {
-  name = "self-hosting-demo-app-datasync@${local.app}-${local.env}"
+  name        = "self-hosting-demo-app-datasync@${local.app}-${local.env}"
   description = "Security group for the datasync"
-  vpc_id = data.aws_vpc.main.id
+  vpc_id      = data.aws_vpc.main.id
 }
 
 resource "aws_security_group_rule" "datasync-egress-all" {
-  type = "egress"
-  from_port = 0
-  to_port = 0
-  protocol = "-1"
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
   security_group_id = aws_security_group.datasync.id
-  cidr_blocks = ["0.0.0.0/0"]
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 resource "aws_datasync_location_s3" "app-models" {
   s3_bucket_arn = aws_s3_bucket.models.arn
-  subdirectory = "/app"
+  subdirectory  = "/app"
   s3_config {
     bucket_access_role_arn = aws_iam_role.datasync.arn
   }
 }
 
 resource "aws_datasync_location_efs" "app-models" {
-  efs_file_system_arn = module.efs.mount_targets["private"].file_system_arn
-  access_point_arn = module.efs.access_points["app"].arn
+  efs_file_system_arn   = module.efs.mount_targets["private"].file_system_arn
+  access_point_arn      = module.efs.access_points["app"].arn
   in_transit_encryption = "TLS1_2"
 
   ec2_config {
     security_group_arns = [aws_security_group.datasync.arn]
-    subnet_arn = data.aws_subnet.private.arn
+    subnet_arn          = data.aws_subnet.private.arn
   }
 }
 
 resource "aws_datasync_task" "app" {
-  name = "self-hosting-demo-${local.env}-app"
+  name                     = "self-hosting-demo-${local.env}-app"
   destination_location_arn = aws_datasync_location_efs.app-models.arn
-  source_location_arn = aws_datasync_location_s3.app-models.arn
+  source_location_arn      = aws_datasync_location_s3.app-models.arn
   cloudwatch_log_group_arn = aws_cloudwatch_log_group.datasync.arn
   options {
     log_level = "TRANSFER"
-    gid = "NONE"
-    uid = "NONE"
+    gid       = "NONE"
+    uid       = "NONE"
   }
 }
 

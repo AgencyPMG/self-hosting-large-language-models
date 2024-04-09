@@ -6,7 +6,7 @@ resource "aws_acm_certificate" "public" {
   ]
 
   tags = {
-    Name        = local.public_hostname
+    Name = local.public_hostname
   }
 
   lifecycle {

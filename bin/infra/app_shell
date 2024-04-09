@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -e
+
+pushd "$(git rev-parse --show-toplevel)"
+
+if [ "$#" -ne 1 ]; then
+  echo "Usage: $0 <environment>"
+  exit 1
+fi
+
+# disable the AWS CLI using a pager
+export AWS_PAGER=""
+
+environment="$1"
+
+cluster="self-hosting-demo-${environment}"
+
+taskArn=$(aws ecs list-tasks \
+    --cluster "$cluster" \
+    --service app \
+    --query "taskArns[0]" \
+    --output text
+) || exit 1
+
+exec aws ecs execute-command \
+    --cluster "$cluster" \
+    --task "$taskArn" \
+    --command /bin/sh \
+    --container app \
+    --interactive

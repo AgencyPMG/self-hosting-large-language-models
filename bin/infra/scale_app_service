@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -e
+
+pushd "$(git rev-parse --show-toplevel)"
+
+if [ "$#" -ne 2 ]; then
+  echo "Usage: $0 <environment> <count>"
+  exit 1
+fi
+
+# disable the AWS CLI using a pager
+export AWS_PAGER=""
+
+environment="$1"
+count="$2"
+
+# cycle through a deployment to get the new model version
+aws ecs update-service \
+    --cluster "self-hosting-demo-$environment" \
+    --service "app" \
+    --desired-count $count

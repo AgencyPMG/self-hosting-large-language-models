@@ -1,6 +1,6 @@
 locals {
   # DNS zone from ailabs/staging
-  dns_zone_id = "Z06660833KLO0Q6PDBGL3"
+  dns_zone_id     = "Z06660833KLO0Q6PDBGL3"
   public_hostname = "selfhosting.${data.aws_route53_zone.main.name}"
 }
 

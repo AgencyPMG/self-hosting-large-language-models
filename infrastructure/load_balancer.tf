@@ -1,5 +1,5 @@
 module "alb" {
-  source = "terraform-aws-modules/alb/aws"
+  source  = "terraform-aws-modules/alb/aws"
   version = "~> 9.8"
 
   name    = "${local.app}-${local.env}-self-hosting-demo"
@@ -50,11 +50,11 @@ module "alb" {
       fixed_response = {
         content_type = "application/json"
         message_body = jsonencode({
-          type = "https://http.cat/404"
-          title = "Not Found"
+          type        = "https://http.cat/404"
+          title       = "Not Found"
           description = "the requested resource was not found"
         })
-        status_code  = 404
+        status_code = 404
       }
 
       rules = {
@@ -63,7 +63,7 @@ module "alb" {
           actions = [
             {
               type             = "forward"
-              target_group_key  = "app"
+              target_group_key = "app"
             }
           ]
           conditions = [
@@ -81,7 +81,7 @@ module "alb" {
           actions = [
             {
               type             = "forward"
-              target_group_key  = "inf"
+              target_group_key = "inf"
             }
           ]
           conditions = [
@@ -100,29 +100,29 @@ module "alb" {
 
   target_groups = {
     app = {
-      name      = "${local.app}-${local.env}-self-hosting-app"
-      protocol         = "HTTP"
-      port             = 8080
-      target_type      = "ip"
+      name              = "${local.app}-${local.env}-self-hosting-app"
+      protocol          = "HTTP"
+      port              = 8080
+      target_type       = "ip"
       create_attachment = false
       health_check = {
-        enabled             = true
-        path                = "/health"
-        healthy_threshold   = 2
-        matcher             = "200"
+        enabled           = true
+        path              = "/health"
+        healthy_threshold = 2
+        matcher           = "200"
       }
     }
     inf = {
-      name      = "${local.app}-${local.env}-self-hosting-inf"
-      protocol         = "HTTP"
-      port             = 8080
-      target_type      = "ip"
+      name              = "${local.app}-${local.env}-self-hosting-inf"
+      protocol          = "HTTP"
+      port              = 8080
+      target_type       = "ip"
       create_attachment = false
       health_check = {
-        enabled             = true
-        path                = "/v2/health/ready"
-        healthy_threshold   = 2
-        matcher             = "200"
+        enabled           = true
+        path              = "/v2/health/ready"
+        healthy_threshold = 2
+        matcher           = "200"
       }
     }
   }

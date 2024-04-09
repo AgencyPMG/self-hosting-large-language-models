@@ -11,8 +11,8 @@ resource "aws_ecr_repository" "app" {
 }
 
 resource "aws_ssm_parameter" "model-version" {
-  name = "/self-hosting-demo/${local.env}/model-version"
-  type = "String"
+  name  = "/self-hosting-demo/${local.env}/model-version"
+  type  = "String"
   value = "changeme"
 
   lifecycle {
@@ -43,11 +43,15 @@ resource "aws_ecs_service" "app" {
     ]
     assign_public_ip = false
   }
+
+  lifecycle {
+    ignore_changes = [desired_count]
+  }
 }
 
 resource "aws_ecs_task_definition" "app" {
   family                   = "${local.app}-${local.env}-self-hosted-demo-app"
-  execution_role_arn  = aws_iam_role.task-exec.arn
+  execution_role_arn       = aws_iam_role.task-exec.arn
   task_role_arn            = aws_iam_role.task.arn
   cpu                      = 1024
   memory                   = 2048
@@ -57,8 +61,8 @@ resource "aws_ecs_task_definition" "app" {
   volume {
     name = "models"
     efs_volume_configuration {
-      file_system_id          = module.efs.id
-      transit_encryption      = "ENABLED"
+      file_system_id     = module.efs.id
+      transit_encryption = "ENABLED"
       authorization_config {
         access_point_id = module.efs.access_points["app"].id
         iam             = "ENABLED"
@@ -91,7 +95,7 @@ resource "aws_ecs_task_definition" "app" {
       name      = "app"
       image     = "${aws_ecr_repository.app.repository_url}:latest"
       essential = true
-      user = "${local.app_efs_uid}:${local.app_efs_gid}"
+      user      = "${local.app_efs_uid}:${local.app_efs_gid}"
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -108,15 +112,15 @@ resource "aws_ecs_task_definition" "app" {
       ]
       secrets = [
         {
-          name = "MODEL_VERSION"
+          name      = "MODEL_VERSION"
           valueFrom = aws_ssm_parameter.model-version.name
         }
       ]
       mountPoints = [
         {
-          sourceVolume = "models"
+          sourceVolume  = "models"
           containerPath = local.model_root_path
-          readOnly = true
+          readOnly      = true
         }
       ]
       linuxParameters = {
