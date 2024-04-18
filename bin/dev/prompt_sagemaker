@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+pushd "$(git rev-parse --show-toplevel)"
+
+export AWS_PAGER=""
+
+results="$(mktemp)"
+prompt="$(jq -cn --arg prompt "$1" '{"inputs":$prompt}' | base64)"
+
+aws sagemaker-runtime invoke-endpoint \
+    --endpoint-name self-hosting-demo-gpt2 \
+    --body "$prompt" \
+    --content-type application/json \
+    "$results"
+
+cat "$results" | jq
+
+rm "$results"

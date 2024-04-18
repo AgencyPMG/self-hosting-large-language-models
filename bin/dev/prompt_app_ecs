@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+pushd "$(git rev-parse --show-toplevel)"
+
+prompt="$(jq -n --arg prompt "$1" '{"prompt":$prompt}')"
+
+exec curl -s -XPOST -d "$prompt" -H 'Content-Type: application/json' https://app.selfhosting.ailabs.allistaging.com/ | jq
