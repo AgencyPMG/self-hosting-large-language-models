@@ -6,4 +6,5 @@ exec docker run --rm \
     -p 8000:8000 \
     --volume "$(pwd)/models:/models" \
     --env MODEL_ROOT_PATH=/models \
+    --env MODEL_VERSION=gpt2 \
     app_example
