@@ -32,11 +32,11 @@ endpointConfig=$(aws sagemaker describe-endpoint-config \
 # 1. Build the model into a tarball locally
 rm -rf "dist/$model.tar.gz"
 mkdir -p "dist/$model"
-#tar -czvf "dist/$model.tar.gz" --directory "models/$model" .
+tar -czvf "dist/$model.tar.gz" --directory "models/$model" .
 
 # 2. upload the tarball to s3 where Sagemaker can get to it
 s3Url="s3://ailabs-staging-self-hosting-demo-models/inf/$model/$version/model.tar.gz"
-#aws s3 cp "dist/$model.tar.gz" "$s3Url"
+aws s3 cp "dist/$model.tar.gz" "$s3Url"
 
 # 3. create a new model pointint to the tarball, we pull the config for this from
 # the "template" model created in infra
